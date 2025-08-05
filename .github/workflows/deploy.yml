@@ -1,0 +1,79 @@
+name: Deploy FastAPI Container
+
+# Define o gatilho para o workflow. Ele será executado
+# sempre que houver um 'push' para a branch 'main'.
+on:
+  push:
+    branches:
+      - main
+
+# Define um conjunto de variáveis de ambiente que podem ser reutilizadas
+# ao longo do workflow. Isso ajuda a evitar repetição.
+env:
+  DOCKER_IMAGE_NAME: seu-usuario-dockerhub/seu-repo-fastapi
+
+# A seção 'jobs' contém as tarefas a serem executadas.
+# Neste caso, temos um único job chamado 'build-and-deploy'.
+jobs:
+  build-and-deploy:
+    # O job irá rodar na última versão do Ubuntu
+    runs-on: ubuntu-latest
+
+    # A seção 'steps' define a sequência de comandos e ações
+    # que o job irá executar.
+    steps:
+      - name: Checkout do código
+        # Usa uma ação do GitHub para clonar o repositório.
+        # Isso garante que o código mais recente esteja disponível.
+        uses: actions/checkout@v3
+
+      - name: Login no Docker Hub
+        # Usa uma ação para autenticar no Docker Hub.
+        # As credenciais são lidas dos segredos (secrets) que você configurou.
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Construir e enviar a imagem Docker
+        # Usa uma ação que constrói a imagem Docker a partir do seu Dockerfile
+        # e a envia para o Docker Hub.
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          # Define as tags da imagem: 'latest' e uma tag com data e hora.
+          tags: |
+            ${{ env.DOCKER_IMAGE_NAME }}:latest
+            ${{ env.DOCKER_IMAGE_NAME }}:$(date +'%Y%m%d%H%M%S')
+
+      - name: Deploy no Servidor via SSH
+        # Usa uma ação que se conecta ao seu servidor via SSH e executa comandos.
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            # Este bloco contém os comandos de shell que serão executados no seu servidor.
+            
+            # Puxa a imagem mais recente do Docker Hub.
+            docker pull ${{ env.DOCKER_IMAGE_NAME }}:latest
+            
+            # Para e remove o container antigo para liberar a porta.
+            # O '|| true' evita que o script pare caso o container não exista.
+            docker stop fastapi-app || true
+            docker rm fastapi-app || true
+            
+            # Inicia um novo container em background (-d) com a nova imagem.
+            # Mapeia a porta 80 do host para a porta 8000 do container.
+            # A opção --restart=always garante que o container reinicie
+            # automaticamente se cair.
+            docker run -d \
+              --name fastapi-app \
+              -p 80:8000 \
+              --restart=always \
+              ${{ env.DOCKER_IMAGE_NAME }}:latest
+            
+            # Limpa imagens Docker antigas não utilizadas para economizar espaço.
+            docker image prune -f

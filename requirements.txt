@@ -2,3 +2,5 @@ fastapi
 uvicorn
 paho-mqtt
 kafka-python
+aiokafka
+mysql-connector-python
