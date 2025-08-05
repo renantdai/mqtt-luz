@@ -1,0 +1,12 @@
+Aplicação FastAPI para usar leitura de OCR
+deverá usar a rota POST, mais detalhes utilizar 127.0.0.1/docs
+
+#Comandos para iniciar a instancia docker
+#Inicia o docker compose em segundo plano
+docker-compose up -d
+
+#Encerra o docker compose
+docker-compose down
+
+#Para rodar local basta instalar todo os requirements e usar o código
+uvicorn main::app --reload
