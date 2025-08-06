@@ -190,8 +190,8 @@ def consultar_dados_lumi(limit: int = 100):
 async def startup_event():
     """Cria a tabela no MySQL e inicia a tarefa de escuta do Kafka."""
     print("Iniciando a aplicação...")
-    create_table_if_not_exists()
-    asyncio.create_task(kafka_listener())
+    #create_table_if_not_exists()
+    #asyncio.create_task(kafka_listener())
 
 @app.on_event("shutdown")
 async def shutdown_event():

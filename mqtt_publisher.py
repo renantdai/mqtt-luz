@@ -6,13 +6,13 @@ import os
 Módulo para gerenciar a publicação de mensagens em um broker MQTT.
 """
 
-MQTT_HOSTNAME = os.getenv('MQTT_HOST', 'mqtt.kntsys.com.br')
-MQTT_PORT = int(os.getenv('MQTT_PORT', 1880))
+MQTT_HOSTNAME = 'mqtt.kntsys.com.br'
+MQTT_PORT = 1880
 MQTT_AUTH = {
-    'username': os.getenv('MQTT_USER', 'imbe'),
-    'password': os.getenv('MQTT_PASS', 'prefeitura')
+            'username': 'imbe',
+            'password': 'prefeitura'
 }
-LOCALIDADE = os.getenv('MQTT_LOCALIDADE', 'imbe')
+LOCALIDADE = 'imbe'
 
 
 def publicar_comando(master_id: str, device_id: str, payload_b64: str):
@@ -27,6 +27,8 @@ def publicar_comando(master_id: str, device_id: str, payload_b64: str):
         "device": device_id,
         "payload": payload_b64
     }
+    print(f"Publicando mensagem no tópico: {topic}")
+    print("Payload JSON:", json.dumps(message))
     
     try:
         publish.single(
@@ -34,7 +36,8 @@ def publicar_comando(master_id: str, device_id: str, payload_b64: str):
             payload=json.dumps(message),
             hostname=MQTT_HOSTNAME,
             port=MQTT_PORT,
-            auth=MQTT_AUTH
+            auth=MQTT_AUTH,
+            timeout=10
         )
         print(f"Comando enviado com sucesso para o tópico: {topic}")
         return {"status": "sucesso", "topic": topic, "message": message}

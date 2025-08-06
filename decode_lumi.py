@@ -110,8 +110,8 @@ def decode_lumi(lumi_payload):
     return dados
 
 # Teste da função com um exemplo de payload em base64
-lumi_payload ="DgD7NgcAAQBeigDBj9cLwrgBHFcwADgEOARkALAnAAAAAQEAAGQ63QAAzma4"
+""" lumi_payload ="DgD7NgcAAQBeigDBj9cLwrgBHFcwADgEOARkALAnAAAAAQEAAGQ63QAAzma4"
 print("Payload original:", lumi_payload)
 recebe = decode_lumi(lumi_payload)
 print("--------------------------------")
-print("Dados decodificados:", recebe)
+print("Dados decodificados:", recebe) """
