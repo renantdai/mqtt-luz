@@ -304,7 +304,6 @@ def route_consultar_dados_lumi(limit: int = Query(100, ge=1, le=1000)):
     return JSONResponse(content=dados)
 
 # --- Endpoints para Envio de Comandos (Downlink) ---
-
 @app.post("/comando/{master_id}/{device_id}/ligar", tags=["Comandos"])
 def ligar_rele(master_id: str, device_id: str):
     """Envia um comando para LIGAR o relé."""
@@ -327,3 +326,15 @@ def dimerizar_rele(master_id: str, device_id: str, percentual: int = Query(..., 
         raise HTTPException(status_code=400, detail=str(e))
     except ConnectionError as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/comando/{master_id}/{device_id}/fotocelula/ativar", tags=["Comandos"])
+def ativar_fotocelular(master_id: str, device_id: str):
+    """Envia um comando para DESLIGAR o relé."""
+    payload = lumi_commands.gerar_comando_ativar_fotocelula()
+    return mqtt_publisher.publicar_comando(master_id, device_id, payload)
+
+@app.post("/comando/{master_id}/{device_id}/fotocelula/desativar", tags=["Comandos"])
+def desativar_fotocelular(master_id: str, device_id: str):
+    """Envia um comando para DESLIGAR o relé."""
+    payload = lumi_commands.gerar_comando_desativar_fotocelula()
+    return mqtt_publisher.publicar_comando(master_id, device_id, payload)

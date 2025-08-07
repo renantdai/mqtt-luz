@@ -36,8 +36,7 @@ def publicar_comando(master_id: str, device_id: str, payload_b64: str):
             payload=json.dumps(message),
             hostname=MQTT_HOSTNAME,
             port=MQTT_PORT,
-            auth=MQTT_AUTH,
-            timeout=10
+            auth=MQTT_AUTH
         )
         print(f"Comando enviado com sucesso para o tópico: {topic}")
         return {"status": "sucesso", "topic": topic, "message": message}
